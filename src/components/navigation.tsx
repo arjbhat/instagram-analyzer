@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, BarChart3, Menu, X } from "lucide-react";
+import { Moon, Sun, Camera, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="p-2 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-xl group-hover:from-purple-500/20 group-hover:to-blue-500/20 transition-all duration-300">
-              <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+              <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
             </div>
             <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Instagram Analyzer
