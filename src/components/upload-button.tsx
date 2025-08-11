@@ -14,14 +14,17 @@ export function UploadButton() {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith('.zip')) {
+    if (!file.name.endsWith(".zip")) {
       toast({
         title: "Invalid file type",
-        description: "Please select a ZIP file from your Instagram data export.",
+        description:
+          "Please select a ZIP file from your Instagram data export.",
         variant: "destructive",
       });
       return;
@@ -31,22 +34,22 @@ export function UploadButton() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        throw new Error("Upload failed");
       }
 
       const data = await response.json();
-      
+
       // Store the data path in sessionStorage
-      sessionStorage.setItem('instagramDataPath', data.dataPath);
-      
+      sessionStorage.setItem("instagramDataPath", data.dataPath);
+
       toast({
         title: "Upload successful!",
         description: "Your Instagram data has been processed. Refreshing...",
@@ -56,18 +59,18 @@ export function UploadButton() {
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-
     } catch (error) {
       toast({
         title: "Upload failed",
-        description: "There was an error processing your file. Please try again.",
+        description:
+          "There was an error processing your file. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsUploading(false);
       // Reset the file input
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };

@@ -9,7 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileArchive, CheckCircle, AlertCircle, Shield, Lock } from "lucide-react";
+import {
+  Upload,
+  FileArchive,
+  CheckCircle,
+  AlertCircle,
+  Shield,
+  Lock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FileUploadSectionProps {
@@ -148,21 +155,28 @@ export function FileUploadSection({
         <CardDescription>
           Upload your Instagram data export ZIP file to analyze your account
         </CardDescription>
-        
+
         {/* VERY PROMINENT PRIVACY NOTICE */}
         <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded-lg p-4 mt-4">
           <div className="flex items-center gap-2 mb-2">
             <Shield className="h-5 w-5 text-green-600" />
-            <h3 className="font-bold text-green-800 dark:text-green-200">🔒 YOUR DATA STAYS PRIVATE</h3>
+            <h3 className="font-bold text-green-800 dark:text-green-200">
+              🔒 YOUR DATA STAYS PRIVATE
+            </h3>
           </div>
           <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
             <div className="flex items-center gap-2">
               <Lock className="h-4 w-4" />
-              <span><strong>100% LOCAL PROCESSING:</strong> Files never leave your browser</span>
+              <span>
+                <strong>100% LOCAL PROCESSING:</strong> Files never leave your
+                browser
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Lock className="h-4 w-4" />
-              <span><strong>NO SERVER STORAGE:</strong> Nothing is uploaded or saved</span>
+              <span>
+                <strong>NO SERVER STORAGE:</strong> Nothing is uploaded or saved
+              </span>
             </div>
           </div>
         </div>
@@ -209,13 +223,14 @@ export function FileUploadSection({
                 ⚠️ WE NEVER STORE YOUR DATA - EVERYTHING IS PROCESSED LOCALLY ⚠️
               </p>
             </div>
-            
+
             <div className="text-left space-y-2 text-sm text-muted-foreground">
               <p className="font-semibold">How to get your Instagram data:</p>
               <ol className="list-decimal list-inside space-y-1">
                 <li>Go to Instagram Settings</li>
                 <li>
-                  Navigate to &quot;Your activity&quot; → &quot;Download your information&quot;
+                  Navigate to &quot;Your activity&quot; → &quot;Download your
+                  information&quot;
                 </li>
                 <li>Select &quot;Some of your information&quot;</li>
                 <li>
