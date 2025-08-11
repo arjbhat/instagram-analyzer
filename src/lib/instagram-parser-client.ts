@@ -1,5 +1,6 @@
 // Client-side Instagram data parser (works with JSZip)
 import JSZip from 'jszip';
+import { detectUserName } from './user-config';
 
 // Instagram JSON data structure interfaces
 interface StringListDataItem {
@@ -255,10 +256,13 @@ export class InstagramDataParserClient {
   }>> {
     const conversations = await this.getConversations();
     const conversationsStatus = new Map();
+    
+    // Detect the current user's name automatically
+    const currentUserName = detectUserName(Array.from(conversations.values()));
 
     for (const [conversationId, conversation] of conversations) {
       const otherParticipants = conversation.participants.filter(
-        p => p.name !== 'Arjun Bhat' // Filter out yourself - TODO: make this configurable
+        p => p.name !== currentUserName // Filter out the current user
       );
 
       const isGroupChat = otherParticipants.length > 1;

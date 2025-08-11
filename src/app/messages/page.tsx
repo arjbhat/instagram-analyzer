@@ -30,6 +30,7 @@ import {
   analyzeConversationSentiment,
   type ConversationSentiment,
 } from "@/lib/sentiment-client";
+import { detectUserName } from "@/lib/user-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -165,6 +166,11 @@ export default function Home() {
   const participants = context.participants || new Map();
   const conversations = context.conversations || new Map();
   const loading = !context.isLoaded;
+  
+  // Detect current user name from conversation data
+  const currentUserName = conversations.size > 0 
+    ? detectUserName(Array.from(conversations.values()))
+    : 'Unknown User';
 
   const getSortedParticipants = () => {
     let filtered = Array.from(participants.entries()).map(([id, participant]) => ({
@@ -571,14 +577,14 @@ export default function Home() {
                         key={index}
                         className={cn(
                           "flex",
-                          message.sender_name === "Arjun Bhat"
+                          message.sender_name === currentUserName
                             ? "justify-end"
                             : "justify-start"
                         )}
                       >
                         <div className="flex items-start gap-1 sm:gap-2 max-w-[85%] sm:max-w-sm">
                           {/* Sentiment score for self messages (on the left of right-aligned messages) */}
-                          {message.sender_name === "Arjun Bhat" &&
+                          {message.sender_name === currentUserName &&
                             messageSentiment &&
                             messageSentiment.sentiment.label !== "neutral" && (
                               <div
@@ -600,7 +606,7 @@ export default function Home() {
                           <div
                             className={cn(
                               "p-2 sm:p-3 rounded-2xl transition-all break-words border max-w-full",
-                              message.sender_name === "Arjun Bhat"
+                              message.sender_name === currentUserName
                                 ? "bg-primary text-primary-foreground border-primary/20 shadow-sm"
                                 : "bg-muted text-muted-foreground border-border shadow-sm"
                             )}
@@ -629,7 +635,7 @@ export default function Home() {
                           </div>
 
                           {/* Sentiment score for non-self messages (on the right of left-aligned messages) */}
-                          {message.sender_name !== "Arjun Bhat" &&
+                          {message.sender_name !== currentUserName &&
                             messageSentiment &&
                             messageSentiment.sentiment.label !== "neutral" && (
                               <div

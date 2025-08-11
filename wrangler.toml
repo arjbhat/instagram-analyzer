@@ -1,0 +1,2 @@
+name = "instagram-analyzer"
+compatibility_flags = ["nodejs_compat"]
