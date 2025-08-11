@@ -111,16 +111,34 @@ export function UploadBanner({ forceShow = false, onClose }: UploadBannerProps) 
         </div>
 
         {/* Instructions */}
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-2">
-            <strong>Need your data?</strong> Instagram → Settings & Privacy → Download your information → Request download → <strong>ZIP format</strong>
+        <div className="text-center space-y-2">
+          <p className="text-sm text-muted-foreground">
+            <strong>Need your data?</strong> Visit{" "}
+            <a 
+              href="https://accountscenter.instagram.com/info_and_permissions/dyi/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-600 hover:text-purple-700 underline font-medium"
+            >
+              Instagram Data Export
+            </a>
+            {" "}(login required)
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Or: Accounts Center → Your information and permissions → Download your information
+          </p>
+          <p className="text-xs text-blue-600 dark:text-blue-400">
+            Select <strong>JSON format</strong> and <strong>download to device</strong> when creating your export
+          </p>
+          <p className="text-xs text-orange-600 dark:text-orange-400">
+            Mobile tip: If your phone auto-extracts the ZIP, try using a file manager app to select the original ZIP file
           </p>
         </div>
 
         <input
           ref={fileInputRef}
           type="file"
-          accept=".zip"
+          accept=".zip,application/zip,application/x-zip-compressed"
           onChange={handleFileChangeWithClose}
           className="hidden"
         />
