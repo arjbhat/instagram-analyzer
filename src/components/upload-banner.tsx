@@ -130,9 +130,6 @@ export function UploadBanner({ forceShow = false, onClose }: UploadBannerProps) 
           <p className="text-xs text-blue-600 dark:text-blue-400">
             Select <strong>JSON format</strong> and <strong>download to device</strong> when creating your export
           </p>
-          <p className="text-xs text-orange-600 dark:text-orange-400">
-            Mobile tip: If your phone auto-extracts the ZIP, try using a file manager app to select the original ZIP file
-          </p>
         </div>
 
         <input

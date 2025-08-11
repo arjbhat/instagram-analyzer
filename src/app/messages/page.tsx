@@ -608,7 +608,7 @@ export default function Home() {
                               "p-2 sm:p-3 rounded-2xl transition-all break-words border max-w-full",
                               message.sender_name === currentUserName
                                 ? "bg-primary text-primary-foreground border-primary/20 shadow-sm"
-                                : "bg-muted text-muted-foreground border-border shadow-sm"
+                                : "bg-muted text-foreground border-border shadow-sm"
                             )}
                           >
                             <div className="text-sm break-words overflow-wrap-anywhere leading-relaxed">
