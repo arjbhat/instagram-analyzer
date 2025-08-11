@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 import { InstagramDataParser } from '@/lib/instagram-parser-server';
 import path from 'path';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const dataPath = path.join(process.cwd(), 'data');
+    const { searchParams } = new URL(request.url);
+    const uploadedPath = searchParams.get('dataPath');
+    const dataPath = uploadedPath || path.join(process.cwd(), 'data');
     const parser = new InstagramDataParser(dataPath);
     
     const conversations = await parser.getConversations();

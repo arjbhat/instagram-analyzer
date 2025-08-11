@@ -5,13 +5,19 @@ import path from 'path';
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const dataType = searchParams.get('type');
+  const uploadedPath = searchParams.get('dataPath');
 
-  const dataDir = path.join(process.cwd(), 'data');
+  if (!uploadedPath) {
+    return NextResponse.json(
+      { error: 'No Instagram data uploaded yet' },
+      { status: 404 }
+    );
+  }
 
   try {
     switch (dataType) {
       case 'followers': {
-        const followersPath = path.join(dataDir, 'connections/followers_and_following/followers_1.json');
+        const followersPath = path.join(uploadedPath, 'connections/followers_and_following/followers_1.json');
         const data = await fs.readFile(followersPath, 'utf-8');
         const parsed = JSON.parse(data);
         
@@ -25,7 +31,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'following': {
-        const followingPath = path.join(dataDir, 'connections/followers_and_following/following.json');
+        const followingPath = path.join(uploadedPath, 'connections/followers_and_following/following.json');
         const data = await fs.readFile(followingPath, 'utf-8');
         const parsed = JSON.parse(data);
         
@@ -48,7 +54,7 @@ export async function GET(request: NextRequest) {
 
         // Load liked posts
         try {
-          const likesPath = path.join(dataDir, 'your_instagram_activity/likes/liked_posts.json');
+          const likesPath = path.join(uploadedPath, 'your_instagram_activity/likes/liked_posts.json');
           const likesData = await fs.readFile(likesPath, 'utf-8');
           const likesParsed = JSON.parse(likesData);
           
@@ -63,7 +69,7 @@ export async function GET(request: NextRequest) {
 
         // Load comments
         try {
-          const commentsPath = path.join(dataDir, 'your_instagram_activity/comments/post_comments_1.json');
+          const commentsPath = path.join(uploadedPath, 'your_instagram_activity/comments/post_comments_1.json');
           const commentsData = await fs.readFile(commentsPath, 'utf-8');
           const commentsParsed = JSON.parse(commentsData);
           
@@ -78,7 +84,7 @@ export async function GET(request: NextRequest) {
 
         // Load story likes
         try {
-          const storyLikesPath = path.join(dataDir, 'your_instagram_activity/story_interactions/story_likes.json');
+          const storyLikesPath = path.join(uploadedPath, 'your_instagram_activity/story_interactions/story_likes.json');
           const storyLikesData = await fs.readFile(storyLikesPath, 'utf-8');
           const storyLikesParsed = JSON.parse(storyLikesData);
           
@@ -92,7 +98,7 @@ export async function GET(request: NextRequest) {
 
         // Load saved posts
         try {
-          const savedPath = path.join(dataDir, 'your_instagram_activity/saved/saved_posts.json');
+          const savedPath = path.join(uploadedPath, 'your_instagram_activity/saved/saved_posts.json');
           const savedData = await fs.readFile(savedPath, 'utf-8');
           const savedParsed = JSON.parse(savedData);
           
@@ -116,7 +122,7 @@ export async function GET(request: NextRequest) {
 
         // Load profile searches
         try {
-          const profileSearchPath = path.join(dataDir, 'logged_information/recent_searches/profile_searches.json');
+          const profileSearchPath = path.join(uploadedPath, 'logged_information/recent_searches/profile_searches.json');
           const profileData = await fs.readFile(profileSearchPath, 'utf-8');
           const profileParsed = JSON.parse(profileData);
           
@@ -130,7 +136,7 @@ export async function GET(request: NextRequest) {
 
         // Load word searches
         try {
-          const wordSearchPath = path.join(dataDir, 'logged_information/recent_searches/word_or_phrase_searches.json');
+          const wordSearchPath = path.join(uploadedPath, 'logged_information/recent_searches/word_or_phrase_searches.json');
           const wordData = await fs.readFile(wordSearchPath, 'utf-8');
           const wordParsed = JSON.parse(wordData);
           
@@ -147,7 +153,7 @@ export async function GET(request: NextRequest) {
 
       case 'posts_viewed': {
         try {
-          const viewsPath = path.join(dataDir, 'ads_information/ads_and_topics/posts_viewed.json');
+          const viewsPath = path.join(uploadedPath, 'ads_information/ads_and_topics/posts_viewed.json');
           const viewsData = await fs.readFile(viewsPath, 'utf-8');
           const viewsParsed = JSON.parse(viewsData);
           

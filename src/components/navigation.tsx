@@ -7,6 +7,7 @@ import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { UploadButton } from "@/components/upload-button";
 
 export function Navigation() {
   const { theme, setTheme } = useTheme();
@@ -24,44 +25,47 @@ export function Navigation() {
           <h1 className="text-xl font-bold">Instagram Analyzer</h1>
           <div className="flex items-center gap-6">
             <div className="flex gap-4">
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 prefetch={true}
                 className={cn(
                   "transition-colors duration-200 hover:scale-105",
-                  pathname === "/" 
-                    ? "text-foreground font-medium" 
+                  pathname === "/"
+                    ? "text-foreground font-medium"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Analytics
               </Link>
-              <Link 
+              <Link
                 href="/messages"
                 prefetch={true}
                 className={cn(
                   "transition-colors duration-200 hover:scale-105",
-                  pathname === "/messages" 
-                    ? "text-foreground font-medium" 
+                  pathname === "/messages"
+                    ? "text-foreground font-medium"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Messages
               </Link>
             </div>
-            {mounted && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </Button>
-            )}
+            <div className="flex items-center gap-3">
+              <UploadButton />
+              {mounted && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

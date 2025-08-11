@@ -95,7 +95,9 @@ function exportConversationToCSV(
   conversation: Conversation,
   participantName: string
 ) {
-  const messages = conversation.messages.filter((msg) => isMessageMeaningful(msg as InstagramMessage));
+  const messages = conversation.messages.filter((msg) =>
+    isMessageMeaningful(msg as InstagramMessage)
+  );
 
   // Prepare CSV data - just the essentials
   const csvData = [
@@ -166,7 +168,6 @@ export default function Home() {
   const [mobileView, setMobileView] = useState<MobileView>("conversations");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
     loadData();
   }, []);
@@ -175,9 +176,18 @@ export default function Home() {
     try {
       setLoading(true);
 
+      // Get the uploaded data path from sessionStorage
+      const dataPath =
+        typeof window !== "undefined"
+          ? sessionStorage.getItem("instagramDataPath")
+          : null;
+      const queryParam = dataPath
+        ? `?dataPath=${encodeURIComponent(dataPath)}`
+        : "";
+
       const [participantsData, conversationsData] = await Promise.all([
-        fetch("/api/participants").then((res) => res.json()),
-        fetch("/api/conversations").then((res) => res.json()),
+        fetch(`/api/participants${queryParam}`).then((res) => res.json()),
+        fetch(`/api/conversations${queryParam}`).then((res) => res.json()),
       ]);
 
       const participantsMap = new Map<string, ConversationParticipant>(
@@ -272,7 +282,9 @@ export default function Home() {
     : [];
 
   const messageStats: MessageStats | null = selectedConversation
-    ? getMessageStats(selectedConversation.messages as unknown as InstagramMessage[])
+    ? getMessageStats(
+        selectedConversation.messages as unknown as InstagramMessage[]
+      )
     : null;
 
   // Load sentiment analysis and momentum when conversation changes
@@ -281,7 +293,9 @@ export default function Home() {
       setConversationSentiment(null); // Reset to show loading
       setConversationMomentum(null);
 
-      analyzeConversationSentiment(selectedConversation.messages as unknown as InstagramMessage[])
+      analyzeConversationSentiment(
+        selectedConversation.messages as unknown as InstagramMessage[]
+      )
         .then((result) => setConversationSentiment(result))
         .catch((error) => {
           console.error("Error analyzing sentiment:", error);
@@ -334,9 +348,11 @@ export default function Home() {
       {/* Main Content - fills remaining height */}
       <div className="flex-1 flex gap-2 sm:gap-4 p-2 sm:p-4 min-h-0 max-w-full mx-auto w-full lg:pb-0 pb-16">
         {/* Left Sidebar - Conversations */}
-        <Card className={`${
-          mobileView === "conversations" ? "flex" : "hidden"
-        } lg:flex w-full lg:w-80 flex-col h-full overflow-hidden`}>
+        <Card
+          className={`${
+            mobileView === "conversations" ? "flex" : "hidden"
+          } lg:flex w-full lg:w-80 flex-col h-full overflow-hidden`}
+        >
           <CardContent className="p-3 sm:p-4 flex flex-col h-full">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base sm:text-lg font-semibold text-card-foreground flex items-center gap-2">
@@ -363,7 +379,9 @@ export default function Home() {
             {/* Compact Filter Controls */}
             <div className="mb-4 space-y-2">
               <div className="flex items-center gap-1 sm:gap-2 text-sm">
-                <span className="text-muted-foreground hidden sm:inline">Show:</span>
+                <span className="text-muted-foreground hidden sm:inline">
+                  Show:
+                </span>
                 <div className="flex gap-1 flex-wrap">
                   <button
                     onClick={() => setChatFilter("all")}
@@ -475,9 +493,11 @@ export default function Home() {
         </Card>
 
         {/* Messages View - Takes middle space */}
-        <Card className={`${
-          mobileView === "messages" ? "flex" : "hidden"
-        } lg:flex w-full flex-1 flex-col h-full overflow-hidden`}>
+        <Card
+          className={`${
+            mobileView === "messages" ? "flex" : "hidden"
+          } lg:flex w-full flex-1 flex-col h-full overflow-hidden`}
+        >
           <CardContent className="p-3 sm:p-6 flex flex-col h-full">
             {selectedConversation ? (
               <>
@@ -486,7 +506,8 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg sm:text-xl font-semibold text-card-foreground truncate">
                       {selectedParticipant
-                        ? participants.get(selectedParticipant)?.name || "Unknown"
+                        ? participants.get(selectedParticipant)?.name ||
+                          "Unknown"
                         : "Unknown"}
                     </h2>
                   </div>
@@ -542,7 +563,9 @@ export default function Home() {
                           }
                           className="rounded border-border"
                         />
-                        <span className="hidden sm:inline">Show only meaningful messages</span>
+                        <span className="hidden sm:inline">
+                          Show only meaningful messages
+                        </span>
                         <span className="sm:hidden">Meaningful only</span>
                       </label>
                     </div>
@@ -629,14 +652,15 @@ export default function Home() {
                             </div>
                             <div className="text-xs mt-1 opacity-70">
                               <span>
-                                {new Date(
-                                  message.timestamp_ms
-                                ).toLocaleString(undefined, {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
+                                {new Date(message.timestamp_ms).toLocaleString(
+                                  undefined,
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
                               </span>
                             </div>
                           </div>
@@ -682,9 +706,11 @@ export default function Home() {
         </Card>
 
         {/* Right Sidebar - Conversation Analysis */}
-        <Card className={`${
-          mobileView === "analysis" ? "flex" : "hidden"
-        } xl:flex w-full xl:w-80 flex-col h-full overflow-hidden`}>
+        <Card
+          className={`${
+            mobileView === "analysis" ? "flex" : "hidden"
+          } xl:flex w-full xl:w-80 flex-col h-full overflow-hidden`}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">

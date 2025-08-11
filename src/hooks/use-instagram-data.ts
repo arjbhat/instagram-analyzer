@@ -84,12 +84,16 @@ export function useInstagramData() {
     setError(null);
     
     try {
+      // Get the uploaded data path from sessionStorage
+      const dataPath = typeof window !== 'undefined' ? sessionStorage.getItem('instagramDataPath') : null;
+      const queryParam = dataPath ? `&dataPath=${encodeURIComponent(dataPath)}` : '';
+      
       const [followersResp, followingResp, engagementResp, searchResp, viewsResp] = await Promise.all([
-        fetch('/api/instagram-data?type=followers'),
-        fetch('/api/instagram-data?type=following'),
-        fetch('/api/instagram-data?type=engagement'),
-        fetch('/api/instagram-data?type=searches'),
-        fetch('/api/instagram-data?type=posts_viewed')
+        fetch(`/api/instagram-data?type=followers${queryParam}`),
+        fetch(`/api/instagram-data?type=following${queryParam}`),
+        fetch(`/api/instagram-data?type=engagement${queryParam}`),
+        fetch(`/api/instagram-data?type=searches${queryParam}`),
+        fetch(`/api/instagram-data?type=posts_viewed${queryParam}`)
       ]);
 
       const newData: InstagramData = {
