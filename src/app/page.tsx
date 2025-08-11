@@ -119,7 +119,7 @@ export default function AnalyticsPage() {
         )}
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <GlowingCard className="relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10" />
             <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">

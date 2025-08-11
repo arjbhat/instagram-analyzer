@@ -33,11 +33,18 @@ export function ChartCard({
 
   return (
     <GlowingCard className={className}>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between">
+          <div className="space-y-3">
+            <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-semibold text-foreground">
+                {description.split(' ')[0]}
+              </span>
+              <CardDescription className="text-sm text-muted-foreground">
+                {description.split(' ').slice(1).join(' ')}
+              </CardDescription>
+            </div>
           </div>
           <ChartToggle 
             viewMode={viewMode} 

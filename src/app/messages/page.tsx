@@ -33,6 +33,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInstagramData as useInstagramDataContext } from '@/contexts/instagram-data-context';
 
 interface ConversationParticipant {
@@ -384,19 +392,18 @@ export default function Home() {
                 </div>
               </div>
 
-              <div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="w-full p-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
-                >
-                  <option value="recent">Recent first</option>
-                  <option value="most-messages">Most messages</option>
-                  <option value="least-messages">Least messages</option>
-                  <option value="alphabetical">A-Z</option>
-                  <option value="oldest">Oldest first</option>
-                </select>
-              </div>
+              <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Recent first</SelectItem>
+                  <SelectItem value="most-messages">Most messages</SelectItem>
+                  <SelectItem value="least-messages">Least messages</SelectItem>
+                  <SelectItem value="alphabetical">A-Z</SelectItem>
+                  <SelectItem value="oldest">Oldest first</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Participants List - Scrollable */}
@@ -1350,44 +1357,73 @@ export default function Home() {
       </div>
 
       {/* Mobile Bottom Tab Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border bg-card/95 backdrop-blur-sm z-50">
-        <div className="flex safe-area-pb">
-          <button
-            onClick={() => setMobileView("conversations")}
-            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-4 text-xs font-medium transition-colors ${
-              mobileView === "conversations"
-                ? "text-primary bg-primary/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <MessageCircle className="h-5 w-5" />
-            Chats
-          </button>
-          <button
-            onClick={() => setMobileView("messages")}
-            disabled={!selectedParticipant}
-            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-4 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              mobileView === "messages"
-                ? "text-primary bg-primary/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <MessageCircle className="h-5 w-5" />
-            Messages
-          </button>
-          <button
-            onClick={() => setMobileView("analysis")}
-            disabled={!selectedParticipant}
-            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-4 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              mobileView === "analysis"
-                ? "text-primary bg-primary/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <BarChart3 className="h-5 w-5" />
-            Analysis
-          </button>
-        </div>
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border/50 z-50 safe-area-pb">
+        <Tabs value={mobileView} onValueChange={(value) => setMobileView(value as MobileView)} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 h-auto bg-transparent rounded-none border-0 p-0">
+            <TabsTrigger 
+              value="conversations" 
+              className="relative flex flex-col items-center gap-1.5 py-3 px-4 text-xs font-medium transition-all duration-200 bg-transparent border-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary hover:bg-muted/30"
+            >
+              <div className="relative">
+                <Users className="h-6 w-6 transition-all duration-200" />
+                {mobileView === "conversations" && (
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                )}
+              </div>
+              <span className={cn(
+                "transition-all duration-200",
+                mobileView === "conversations" ? "font-semibold" : "font-normal"
+              )}>
+                People
+              </span>
+              {mobileView === "conversations" && (
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
+              )}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="messages"
+              disabled={!selectedParticipant}
+              className="relative flex flex-col items-center gap-1.5 py-3 px-4 text-xs font-medium transition-all duration-200 bg-transparent border-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary hover:bg-muted/30 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <div className="relative">
+                <MessageCircle className="h-6 w-6 transition-all duration-200" />
+                {mobileView === "messages" && (
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                )}
+              </div>
+              <span className={cn(
+                "transition-all duration-200",
+                mobileView === "messages" ? "font-semibold" : "font-normal"
+              )}>
+                Messages
+              </span>
+              {mobileView === "messages" && (
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
+              )}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="analysis"
+              disabled={!selectedParticipant}
+              className="relative flex flex-col items-center gap-1.5 py-3 px-4 text-xs font-medium transition-all duration-200 bg-transparent border-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary hover:bg-muted/30 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <div className="relative">
+                <BarChart3 className="h-6 w-6 transition-all duration-200" />
+                {mobileView === "analysis" && (
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                )}
+              </div>
+              <span className={cn(
+                "transition-all duration-200",
+                mobileView === "analysis" ? "font-semibold" : "font-normal"
+              )}>
+                Analysis
+              </span>
+              {mobileView === "analysis" && (
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
+              )}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
     </div>
   );
