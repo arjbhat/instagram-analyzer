@@ -45,7 +45,7 @@ function fixTextEncoding(text: string): string {
     // Instagram JSON exports often have UTF-8 text incorrectly interpreted as Latin-1
     // Convert from Latin-1 to UTF-8 to fix mojibake
     return iconv.decode(iconv.encode(text, 'latin1'), 'utf8');
-  } catch (error) {
+  } catch {
     // If conversion fails, return original text
     return text;
   }
