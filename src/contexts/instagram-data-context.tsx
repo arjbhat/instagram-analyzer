@@ -1,8 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { InstagramConversation, InstagramDataParserClient, FollowerData } from '@/lib/instagram-parser-client';
-import { ConversationSentiment } from '@/lib/sentiment-client';
 
 interface InstagramDataContextType {
   isLoaded: boolean;

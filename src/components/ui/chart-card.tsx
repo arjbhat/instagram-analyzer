@@ -6,10 +6,7 @@ import { GlowingCard } from './glowing-card';
 import { ChartToggle } from './chart-toggle';
 import { TimeChart } from './time-chart';
 
-interface TimeDataPoint {
-  timestamp: number;
-  [key: string]: any;
-}
+import type { TimeDataPoint } from '@/types/instagram';
 
 interface ChartCardProps {
   title: string;

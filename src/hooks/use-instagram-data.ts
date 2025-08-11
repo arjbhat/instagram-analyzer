@@ -1,70 +1,36 @@
 import { useInstagramData as useInstagramDataContext } from '@/contexts/instagram-data-context';
+import type {
+  FollowerData,
+  LikeData,
+  CommentData,
+  StoryLikeData,
+  SavedData,
+  EngagementData,
+  ProfileSearch,
+  WordSearch,
+  SearchData,
+  PostView,
+  InstagramData,
+  InstagramDataWithMetrics
+} from '@/types/instagram';
 
-export interface FollowerData {
-  username: string;
-  timestamp: number;
-  href: string;
-}
+// Re-export types for other modules
+export type {
+  FollowerData,
+  LikeData,
+  CommentData,
+  StoryLikeData,
+  SavedData,
+  EngagementData,
+  ProfileSearch,
+  WordSearch,
+  SearchData,
+  PostView,
+  InstagramData,
+  InstagramDataWithMetrics
+};
 
-export interface LikeData {
-  title: string;
-  href: string;
-  timestamp: number;
-}
-
-export interface CommentData {
-  title: string;
-  comment: string;
-  timestamp: number;
-}
-
-export interface StoryLikeData {
-  title: string;
-  timestamp: number;
-}
-
-export interface SavedData {
-  title: string;
-  href: string;
-  timestamp: number;
-}
-
-export interface EngagementData {
-  likes: LikeData[];
-  comments: CommentData[];
-  storyLikes: StoryLikeData[];
-  saved: SavedData[];
-}
-
-export interface ProfileSearch {
-  value: string;
-  searchTime: number;
-}
-
-export interface WordSearch {
-  value: string;
-  searchTime: number;
-}
-
-export interface SearchData {
-  profileSearches: ProfileSearch[];
-  wordSearches: WordSearch[];
-}
-
-export interface PostView {
-  author: string;
-  timestamp: number;
-}
-
-export interface InstagramData {
-  followers: FollowerData[];
-  following: FollowerData[];
-  engagement: EngagementData;
-  searchData: SearchData;
-  postsViewed: PostView[];
-}
-
-export function useInstagramData() {
+export function useInstagramData(): InstagramDataWithMetrics {
   const context = useInstagramDataContext();
   
   // Transform context data to match the expected format
@@ -79,9 +45,9 @@ export function useInstagramData() {
       timestamp: f.timestamp,
       href: f.href
     })) : [],
-    engagement: context.engagementData || { likes: [], comments: [], storyLikes: [], saved: [] },
-    searchData: context.searchData || { profileSearches: [], wordSearches: [] },
-    postsViewed: context.postsViewed || []
+    engagement: (context.engagementData as EngagementData) ?? { likes: [], comments: [], storyLikes: [], saved: [] },
+    searchData: (context.searchData as SearchData) ?? { profileSearches: [], wordSearches: [] },
+    postsViewed: (context.postsViewed as PostView[]) ?? []
   };
 
   const loading = !context.isLoaded;

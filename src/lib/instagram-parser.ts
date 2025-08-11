@@ -1,4 +1,5 @@
 // Client-side utilities for Instagram data processing
+import type { FollowerData } from '@/types/instagram';
 
 export interface InstagramMessage {
   sender_name: string;
@@ -46,11 +47,6 @@ export interface InstagramConversation {
   messages: InstagramMessage[];
 }
 
-export interface FollowerData {
-  href: string;
-  value: string;
-  timestamp: number;
-}
 
 export interface InstagramFollower {
   string_list_data: FollowerData[];

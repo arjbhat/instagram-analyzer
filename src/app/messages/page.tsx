@@ -40,19 +40,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInstagramData as useInstagramDataContext } from '@/contexts/instagram-data-context';
 
-interface ConversationParticipant {
-  id: string;
-  name: string;
-  username?: string;
-  messageCount: number;
-  lastMessageTime: number;
-  isGroupChat: boolean;
-  participantCount: number;
-  participantNames: string[];
-}
 
 interface Message {
   sender_name: string;
@@ -202,7 +192,7 @@ export default function Home() {
         // For group chats, also search participant names
         const participantMatch =
           participant.isGroupChat &&
-          participant.participantNames.some((name) =>
+          participant.participantNames.some((name: string) =>
             name.toLowerCase().includes(query)
           );
         return nameMatch || usernameMatch || participantMatch;
@@ -234,7 +224,7 @@ export default function Home() {
 
   // Filter messages and calculate stats
   const filteredMessages = selectedConversation
-    ? selectedConversation.messages.filter((message) => {
+    ? selectedConversation.messages.filter((message: Message) => {
         // Filter by meaningful messages
         const isMeaningful = showOnlyMeaningful
           ? isMessageMeaningful(message as unknown as InstagramMessage)

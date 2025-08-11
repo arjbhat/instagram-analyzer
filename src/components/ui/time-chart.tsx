@@ -1,11 +1,7 @@
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-
-interface TimeDataPoint {
-  timestamp: number;
-  [key: string]: any;
-}
+import type { TimeDataPoint } from '@/types/instagram';
 
 interface TimeChartProps {
   data: TimeDataPoint[];

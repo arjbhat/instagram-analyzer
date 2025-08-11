@@ -1,6 +1,56 @@
 // Client-side Instagram data parser (works with JSZip)
 import JSZip from 'jszip';
 
+// Instagram JSON data structure interfaces
+interface StringListDataItem {
+  value: string;
+  timestamp: number;
+  href?: string;
+}
+
+
+interface LikesDataItem {
+  title: string;
+  string_list_data: StringListDataItem[];
+}
+
+interface CommentsDataItem {
+  title: string;
+  string_list_data: StringListDataItem[];
+}
+
+interface StoryLikesDataItem {
+  title: string;
+  string_list_data: StringListDataItem[];
+}
+
+interface SavedPostsDataItem {
+  title: string;
+  string_list_data?: StringListDataItem[];
+  string_map_data?: Record<string, { href?: string; timestamp?: number }>;
+}
+
+interface ProfileSearchDataItem {
+  string_map_data?: {
+    Search?: { value: string };
+    Time?: { timestamp: number };
+  };
+}
+
+interface WordSearchDataItem {
+  string_map_data?: {
+    Search?: { value: string };
+    Time?: { timestamp: number };
+  };
+}
+
+interface PostViewDataItem {
+  string_map_data?: {
+    Author?: { value: string };
+    Time?: { timestamp: number };
+  };
+}
+
 export interface InstagramMessage {
   sender_name: string;
   timestamp_ms: number;
@@ -281,14 +331,17 @@ export class InstagramDataParserClient {
         const likesData = await likesFile.async('text');
         const likesParsed = JSON.parse(likesData);
         
-        result.likes = likesParsed.likes_media_likes?.map((item: unknown) => ({
+        result.likes = likesParsed.likes_media_likes?.map((item: LikesDataItem) => ({
           title: item.title,
           href: item.string_list_data[0]?.href || '',
           timestamp: item.string_list_data[0]?.timestamp || 0
         })) || [];
       }
-    } catch {
-      console.log('Could not load likes');
+    } catch (error) {
+      // Silently handle optional data loading failure
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not load likes:', error);
+      }
     }
 
     // Load comments
@@ -299,14 +352,17 @@ export class InstagramDataParserClient {
         const commentsData = await commentsFile.async('text');
         const commentsParsed = JSON.parse(commentsData);
         
-        result.comments = commentsParsed.comments_media_comments?.map((item: any) => ({
+        result.comments = commentsParsed.comments_media_comments?.map((item: CommentsDataItem) => ({
           title: item.title,
           comment: item.string_list_data[0]?.value || '',
           timestamp: item.string_list_data[0]?.timestamp || 0
         })) || [];
       }
-    } catch {
-      console.log('Could not load comments');
+    } catch (error) {
+      // Silently handle optional data loading failure
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not load comments:', error);
+      }
     }
 
     // Load story likes
@@ -317,13 +373,16 @@ export class InstagramDataParserClient {
         const storyLikesData = await storyLikesFile.async('text');
         const storyLikesParsed = JSON.parse(storyLikesData);
         
-        result.storyLikes = storyLikesParsed.story_activities_story_likes?.map((item: any) => ({
+        result.storyLikes = storyLikesParsed.story_activities_story_likes?.map((item: StoryLikesDataItem) => ({
           title: item.title,
           timestamp: item.string_list_data[0]?.timestamp || 0
         })) || [];
       }
-    } catch {
-      console.log('Could not load story likes');
+    } catch (error) {
+      // Silently handle optional data loading failure
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not load story likes:', error);
+      }
     }
 
     // Load saved posts
@@ -334,14 +393,17 @@ export class InstagramDataParserClient {
         const savedData = await savedFile.async('text');
         const savedParsed = JSON.parse(savedData);
         
-        result.saved = savedParsed.saved_saved_media?.map((item: any) => ({
+        result.saved = savedParsed.saved_saved_media?.map((item: SavedPostsDataItem) => ({
           title: item.title,
           href: item.string_map_data?.['Saved on']?.href || '',
           timestamp: item.string_map_data?.['Saved on']?.timestamp || 0
         })) || [];
       }
-    } catch {
-      console.log('Could not load saved posts');
+    } catch (error) {
+      // Silently handle optional data loading failure
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not load saved posts:', error);
+      }
     }
 
     return result;
@@ -362,13 +424,16 @@ export class InstagramDataParserClient {
         const profileData = await profileFile.async('text');
         const profileParsed = JSON.parse(profileData);
         
-        result.profileSearches = profileParsed.searches_user?.map((item: any) => ({
+        result.profileSearches = profileParsed.searches_user?.map((item: ProfileSearchDataItem) => ({
           value: item.string_map_data?.Search?.value || '',
           searchTime: item.string_map_data?.Time?.timestamp || 0
         })) || [];
       }
-    } catch {
-      console.log('Could not load profile searches');
+    } catch (error) {
+      // Silently handle optional data loading failure
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not load profile searches:', error);
+      }
     }
 
     // Load word searches
@@ -379,13 +444,16 @@ export class InstagramDataParserClient {
         const wordData = await wordFile.async('text');
         const wordParsed = JSON.parse(wordData);
         
-        result.wordSearches = wordParsed.searches_keyword?.map((item: any) => ({
+        result.wordSearches = wordParsed.searches_keyword?.map((item: WordSearchDataItem) => ({
           value: item.string_map_data?.Search?.value || '',
           searchTime: item.string_map_data?.Time?.timestamp || 0
         })) || [];
       }
-    } catch {
-      console.log('Could not load word searches');
+    } catch (error) {
+      // Silently handle optional data loading failure
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not load word searches:', error);
+      }
     }
 
     return result;
@@ -400,13 +468,16 @@ export class InstagramDataParserClient {
         const viewsData = await viewsFile.async('text');
         const viewsParsed = JSON.parse(viewsData);
         
-        return viewsParsed.impressions_history_posts_seen?.map((item: any) => ({
+        return viewsParsed.impressions_history_posts_seen?.map((item: PostViewDataItem) => ({
           author: item.string_map_data?.Author?.value || '',
           timestamp: item.string_map_data?.Time?.timestamp || 0
         })) || [];
       }
-    } catch {
-      console.log('Could not load posts viewed');
+    } catch (error) {
+      // Silently handle optional data loading failure
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not load posts viewed:', error);
+      }
     }
     
     return [];

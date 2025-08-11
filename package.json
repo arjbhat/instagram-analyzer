@@ -38,6 +38,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sentiment": "^5.0.4",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "eslint": "^9",

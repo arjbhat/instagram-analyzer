@@ -11,7 +11,7 @@ import {
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Users, Heart, UserCheck, Download, Shield } from "lucide-react";
+import { Users, Heart, UserCheck, Download } from "lucide-react";
 import { useInstagramData } from "@/hooks/use-instagram-data";
 import { UserList } from "@/components/ui/user-list";
 import { SearchInput } from "@/components/ui/search-input";
