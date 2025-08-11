@@ -64,6 +64,7 @@ type SortOption =
   | "oldest"
   | "alphabetical";
 type ChatFilter = "all" | "individual" | "group";
+type MobileView = "conversations" | "messages" | "analysis";
 
 // Helper function to highlight search terms
 function highlightSearchTerm(text: string, searchTerm: string) {
@@ -162,6 +163,7 @@ export default function Home() {
     activity: true,
     sentiment: true,
   });
+  const [mobileView, setMobileView] = useState<MobileView>("conversations");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
 
@@ -329,16 +331,18 @@ export default function Home() {
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
-
       {/* Main Content - fills remaining height */}
-      <div className="flex-1 flex gap-4 p-4 min-h-0 max-w-full mx-auto w-full">
+      <div className="flex-1 flex gap-2 sm:gap-4 p-2 sm:p-4 min-h-0 max-w-full mx-auto w-full lg:pb-0 pb-16">
         {/* Left Sidebar - Conversations */}
-        <Card className="w-80 flex flex-col h-full overflow-hidden">
-          <CardContent className="p-4 flex flex-col h-full">
+        <Card className={`${
+          mobileView === "conversations" ? "flex" : "hidden"
+        } lg:flex w-full lg:w-80 flex-col h-full overflow-hidden`}>
+          <CardContent className="p-3 sm:p-4 flex flex-col h-full">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-card-foreground flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-semibold text-card-foreground flex items-center gap-2">
                 <MessageCircle className="h-4 w-4" />
-                Conversations
+                <span className="hidden sm:inline">Conversations</span>
+                <span className="sm:hidden">Chats</span>
               </h2>
             </div>
 
@@ -348,22 +352,22 @@ export default function Home() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search conversations..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 text-sm bg-background border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 />
               </div>
             </div>
 
             {/* Compact Filter Controls */}
             <div className="mb-4 space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-muted-foreground">Show:</span>
-                <div className="flex gap-1">
+              <div className="flex items-center gap-1 sm:gap-2 text-sm">
+                <span className="text-muted-foreground hidden sm:inline">Show:</span>
+                <div className="flex gap-1 flex-wrap">
                   <button
                     onClick={() => setChatFilter("all")}
-                    className={`px-2 py-1 text-xs rounded ${
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
                       chatFilter === "all"
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
@@ -373,25 +377,25 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setChatFilter("individual")}
-                    className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${
+                    className={`px-2 py-1 text-xs rounded flex items-center gap-1 transition-colors ${
                       chatFilter === "individual"
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                     }`}
                   >
                     <User className="h-3 w-3" />
-                    1:1
+                    <span className="hidden sm:inline">1:1</span>
                   </button>
                   <button
                     onClick={() => setChatFilter("group")}
-                    className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${
+                    className={`px-2 py-1 text-xs rounded flex items-center gap-1 transition-colors ${
                       chatFilter === "group"
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                     }`}
                   >
                     <Users className="h-3 w-3" />
-                    Groups
+                    <span className="hidden sm:inline">Groups</span>
                   </button>
                 </div>
               </div>
@@ -400,7 +404,7 @@ export default function Home() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="w-full p-2 text-sm bg-background border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                  className="w-full p-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 >
                   <option value="recent">Recent first</option>
                   <option value="most-messages">Most messages</option>
@@ -412,20 +416,26 @@ export default function Home() {
             </div>
 
             {/* Participants List - Scrollable */}
-            <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
+            <div className="flex-1 overflow-y-auto space-y-1 min-h-0 scrollbar-thin">
               {filteredParticipants.map((participant) => (
                 <div
                   key={participant.id}
-                  onClick={() => setSelectedParticipant(participant.id)}
+                  onClick={() => {
+                    setSelectedParticipant(participant.id);
+                    // Auto-switch to messages view on mobile when conversation is selected
+                    if (window.innerWidth < 1024) {
+                      setMobileView("messages");
+                    }
+                  }}
                   className={cn(
-                    "p-3 rounded-md cursor-pointer transition-all duration-200 border",
+                    "p-3 rounded-lg cursor-pointer transition-all duration-200 border active:scale-95",
                     selectedParticipant === participant.id
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card hover:bg-secondary border-border"
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-card hover:bg-accent border-border hover:border-accent-foreground/20"
                   )}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <div className="font-semibold truncate pr-2">
+                    <div className="font-semibold truncate pr-2 text-sm sm:text-base">
                       {participant.name}
                     </div>
                     {participant.isGroupChat ? (
@@ -465,21 +475,25 @@ export default function Home() {
         </Card>
 
         {/* Messages View - Takes middle space */}
-        <Card className="flex-1 flex flex-col h-full overflow-hidden">
-          <CardContent className="p-6 flex flex-col h-full">
+        <Card className={`${
+          mobileView === "messages" ? "flex" : "hidden"
+        } lg:flex w-full flex-1 flex-col h-full overflow-hidden`}>
+          <CardContent className="p-3 sm:p-6 flex flex-col h-full">
             {selectedConversation ? (
               <>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4 flex-shrink-0">
-                  <h2 className="text-xl font-semibold text-card-foreground">
-                    {selectedParticipant
-                      ? participants.get(selectedParticipant)?.name || "Unknown"
-                      : "Unknown"}
-                  </h2>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg sm:text-xl font-semibold text-card-foreground truncate">
+                      {selectedParticipant
+                        ? participants.get(selectedParticipant)?.name || "Unknown"
+                        : "Unknown"}
+                    </h2>
+                  </div>
+                  <div className="flex items-center gap-2 sm:gap-4">
                     <Button
                       variant="outline"
-                      size="icon"
+                      size="sm"
                       onClick={() => {
                         if (selectedConversation && selectedParticipant) {
                           const participantName =
@@ -494,8 +508,9 @@ export default function Home() {
                       title="Export conversation to CSV"
                     >
                       <Download className="h-4 w-4" />
+                      <span className="hidden sm:inline ml-1">Export</span>
                     </Button>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
                       {messageSearchQuery ? (
                         <span>
                           {filteredMessages.length} search results
@@ -515,7 +530,7 @@ export default function Home() {
 
                 {/* Message Filter Controls */}
                 <div className="mb-4 space-y-3 flex-shrink-0">
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     <div className="flex items-center gap-2">
                       <Filter className="h-4 w-4 text-muted-foreground" />
                       <label className="flex items-center gap-2 text-sm">
@@ -525,9 +540,10 @@ export default function Home() {
                           onChange={(e) =>
                             setShowOnlyMeaningful(e.target.checked)
                           }
-                          className="rounded"
+                          className="rounded border-border"
                         />
-                        Show only meaningful messages
+                        <span className="hidden sm:inline">Show only meaningful messages</span>
+                        <span className="sm:hidden">Meaningful only</span>
                       </label>
                     </div>
                   </div>
@@ -540,7 +556,7 @@ export default function Home() {
                       placeholder="Search messages..."
                       value={messageSearchQuery}
                       onChange={(e) => setMessageSearchQuery(e.target.value)}
-                      className="flex-1 px-3 py-2 text-sm bg-background border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                      className="flex-1 px-3 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                     />
                     {messageSearchQuery && (
                       <Button
@@ -556,7 +572,7 @@ export default function Home() {
                 </div>
 
                 {/* Messages Container - fills remaining space */}
-                <div className="flex-1 border rounded-lg p-4 overflow-y-auto space-y-3 bg-muted/20 min-h-0">
+                <div className="flex-1 border border-border rounded-lg p-2 sm:p-4 overflow-y-auto space-y-3 bg-muted/20 min-h-0 scrollbar-thin">
                   {filteredMessages.map((message: Message, index: number) => {
                     // Find sentiment for this message
                     const messageSentiment =
@@ -574,18 +590,18 @@ export default function Home() {
                             : "justify-start"
                         )}
                       >
-                        <div className="flex items-start gap-2">
+                        <div className="flex items-start gap-1 sm:gap-2 max-w-[85%] sm:max-w-sm">
                           {/* Sentiment score for self messages (on the left of right-aligned messages) */}
                           {message.sender_name === "Arjun Bhat" &&
                             messageSentiment &&
                             messageSentiment.sentiment.label !== "neutral" && (
                               <div
                                 className={cn(
-                                  "px-1.5 py-0.5 rounded text-xs font-medium",
+                                  "px-1.5 py-0.5 rounded text-xs font-medium self-end mb-1",
                                   messageSentiment.sentiment.label ===
                                     "positive"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
+                                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                                    : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
                                 )}
                               >
                                 {messageSentiment.sentiment.score > 0
@@ -597,13 +613,13 @@ export default function Home() {
 
                           <div
                             className={cn(
-                              "p-3 rounded-2xl max-w-xs transition-all break-words border",
+                              "p-2 sm:p-3 rounded-2xl transition-all break-words border max-w-full",
                               message.sender_name === "Arjun Bhat"
-                                ? "bg-primary text-primary-foreground border-primary"
-                                : "bg-secondary text-secondary-foreground border-border"
+                                ? "bg-primary text-primary-foreground border-primary/20 shadow-sm"
+                                : "bg-muted text-muted-foreground border-border shadow-sm"
                             )}
                           >
-                            <div className="text-sm break-words overflow-wrap-anywhere">
+                            <div className="text-sm break-words overflow-wrap-anywhere leading-relaxed">
                               {message.content
                                 ? highlightSearchTerm(
                                     message.content,
@@ -611,11 +627,16 @@ export default function Home() {
                                   )
                                 : "[Media/Attachment]"}
                             </div>
-                            <div className="flex items-center justify-between text-xs mt-1 opacity-70">
+                            <div className="text-xs mt-1 opacity-70">
                               <span>
                                 {new Date(
                                   message.timestamp_ms
-                                ).toLocaleString()}
+                                ).toLocaleString(undefined, {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
                               </span>
                             </div>
                           </div>
@@ -626,11 +647,11 @@ export default function Home() {
                             messageSentiment.sentiment.label !== "neutral" && (
                               <div
                                 className={cn(
-                                  "px-1.5 py-0.5 rounded text-xs font-medium",
+                                  "px-1.5 py-0.5 rounded text-xs font-medium self-end mb-1",
                                   messageSentiment.sentiment.label ===
                                     "positive"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
+                                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                                    : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
                                 )}
                               >
                                 {messageSentiment.sentiment.score > 0
@@ -647,26 +668,38 @@ export default function Home() {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center justify-center flex-1 text-muted-foreground">
-                <MessageCircle className="h-16 w-16 mb-4 opacity-20" />
-                <div className="text-lg">
+              <div className="flex flex-col items-center justify-center flex-1 text-muted-foreground p-8">
+                <MessageCircle className="h-12 sm:h-16 w-12 sm:w-16 mb-4 opacity-20" />
+                <div className="text-base sm:text-lg text-center">
                   Select a conversation to view messages
+                </div>
+                <div className="text-sm mt-2 opacity-70 text-center">
+                  Choose from the conversations on the left
                 </div>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Sentiment Insights Panel - Fixed width */}
         {/* Right Sidebar - Conversation Analysis */}
-        <Card className="w-80 flex flex-col h-full overflow-hidden">
+        <Card className={`${
+          mobileView === "analysis" ? "flex" : "hidden"
+        } xl:flex w-full xl:w-80 flex-col h-full overflow-hidden`}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Conversation Analysis
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden lg:inline">Analysis</span>
+                <span className="lg:hidden">Stats</span>
+              </CardTitle>
+              {selectedParticipant && (
+                <div className="text-sm text-muted-foreground truncate max-w-32 lg:max-w-40">
+                  {participants.get(selectedParticipant)?.name || "Unknown"}
+                </div>
+              )}
+            </div>
           </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto space-y-6">
+          <CardContent className="flex-1 overflow-y-auto space-y-6 scrollbar-thin">
             {selectedConversation && messageStats ? (
               <>
                 {/* Message Overview - Collapsible */}
@@ -1322,6 +1355,47 @@ export default function Home() {
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Mobile Bottom Tab Navigation */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border bg-card/95 backdrop-blur-sm z-50">
+        <div className="flex safe-area-pb">
+          <button
+            onClick={() => setMobileView("conversations")}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-4 text-xs font-medium transition-colors ${
+              mobileView === "conversations"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <MessageCircle className="h-5 w-5" />
+            Chats
+          </button>
+          <button
+            onClick={() => setMobileView("messages")}
+            disabled={!selectedParticipant}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-4 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              mobileView === "messages"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <MessageCircle className="h-5 w-5" />
+            Messages
+          </button>
+          <button
+            onClick={() => setMobileView("analysis")}
+            disabled={!selectedParticipant}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-4 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              mobileView === "analysis"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BarChart3 className="h-5 w-5" />
+            Analysis
+          </button>
+        </div>
       </div>
     </div>
   );
