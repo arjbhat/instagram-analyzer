@@ -4,11 +4,15 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import JSZip from 'jszip';
+import { InstagramDataParserClient } from '@/lib/instagram-parser-client';
+import { useInstagramData } from '@/contexts/instagram-data-context';
 
 export function UploadButton() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { setData } = useInstagramData();
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -33,33 +37,22 @@ export function UploadButton() {
     setIsUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      // Process ZIP file entirely client-side
+      const arrayBuffer = await file.arrayBuffer();
+      const zip = new JSZip();
+      await zip.loadAsync(arrayBuffer);
 
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      // Create client-side parser
+      const parser = new InstagramDataParserClient(zip);
 
-      if (!response.ok) {
-        throw new Error("Upload failed");
-      }
-
-      const data = await response.json();
-
-      // Store the data path in sessionStorage
-      sessionStorage.setItem("instagramDataPath", data.dataPath);
+      // Load all data using the context
+      await setData(parser);
 
       toast({
         title: "Upload successful!",
-        description: "Your Instagram data has been processed. Refreshing...",
+        description: "Your Instagram data has been processed.",
       });
-
-      // Refresh the page to load new data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    } catch (error) {
+    } catch {
       toast({
         title: "Upload failed",
         description:

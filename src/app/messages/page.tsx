@@ -29,10 +29,11 @@ import {
 import {
   analyzeConversationSentiment,
   type ConversationSentiment,
-} from "@/lib/sentiment-analyzer";
+} from "@/lib/sentiment-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useInstagramData as useInstagramDataContext } from '@/contexts/instagram-data-context';
 
 interface ConversationParticipant {
   id: string;
@@ -136,19 +137,13 @@ function exportConversationToCSV(
 }
 
 export default function Home() {
-  const [participants, setParticipants] = useState<
-    Map<string, ConversationParticipant>
-  >(new Map());
-  const [conversations, setConversations] = useState<Map<string, Conversation>>(
-    new Map()
-  );
+  const context = useInstagramDataContext();
+  
   const [selectedParticipant, setSelectedParticipant] = useState<string | null>(
     null
   );
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [chatFilter, setChatFilter] = useState<ChatFilter>("all");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [messageSearchQuery, setMessageSearchQuery] = useState("");
   const [showOnlyMeaningful, setShowOnlyMeaningful] = useState(true);
@@ -168,46 +163,16 @@ export default function Home() {
   const [mobileView, setMobileView] = useState<MobileView>("conversations");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-
-      // Get the uploaded data path from sessionStorage
-      const dataPath =
-        typeof window !== "undefined"
-          ? sessionStorage.getItem("instagramDataPath")
-          : null;
-      const queryParam = dataPath
-        ? `?dataPath=${encodeURIComponent(dataPath)}`
-        : "";
-
-      const [participantsData, conversationsData] = await Promise.all([
-        fetch(`/api/participants${queryParam}`).then((res) => res.json()),
-        fetch(`/api/conversations${queryParam}`).then((res) => res.json()),
-      ]);
-
-      const participantsMap = new Map<string, ConversationParticipant>(
-        (participantsData as ConversationParticipant[]).map((p) => [p.id, p])
-      );
-      const conversationsMap = new Map<string, Conversation>(
-        (conversationsData as Conversation[]).map((c) => [c.id, c])
-      );
-
-      setParticipants(participantsMap);
-      setConversations(conversationsMap);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load data");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Get data from context
+  const participants = context.participants || new Map();
+  const conversations = context.conversations || new Map();
+  const loading = !context.isLoaded;
 
   const getSortedParticipants = () => {
-    let filtered = Array.from(participants.values());
+    let filtered = Array.from(participants.entries()).map(([id, participant]) => ({
+      id,
+      ...participant
+    }));
 
     // Apply chat type filter
     if (chatFilter !== "all") {
@@ -293,14 +258,15 @@ export default function Home() {
       setConversationSentiment(null); // Reset to show loading
       setConversationMomentum(null);
 
-      analyzeConversationSentiment(
-        selectedConversation.messages as unknown as InstagramMessage[]
-      )
-        .then((result) => setConversationSentiment(result))
-        .catch((error) => {
-          console.error("Error analyzing sentiment:", error);
-          setConversationSentiment(null);
-        });
+      try {
+        const result = analyzeConversationSentiment(
+          selectedConversation.messages as unknown as InstagramMessage[]
+        );
+        setConversationSentiment(result);
+      } catch (error) {
+        console.error("Error analyzing sentiment:", error);
+        setConversationSentiment(null);
+      }
 
       // Calculate conversation momentum
       const momentum = calculateConversationMomentum(
@@ -333,11 +299,11 @@ export default function Home() {
     );
   }
 
-  if (error) {
+  if (!context.isLoaded && !loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="bg-card text-card-foreground p-6 rounded-lg shadow-lg border">
-          <div className="text-xl text-destructive">⚠️ Error: {error}</div>
+          <div className="text-xl text-muted-foreground">Please upload your Instagram data to get started</div>
         </div>
       </div>
     );

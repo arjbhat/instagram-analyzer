@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useInstagramData as useInstagramDataContext } from '@/contexts/instagram-data-context';
 
 export interface FollowerData {
   username: string;
@@ -65,52 +65,27 @@ export interface InstagramData {
 }
 
 export function useInstagramData() {
-  const [data, setData] = useState<InstagramData>({
-    followers: [],
-    following: [],
-    engagement: { likes: [], comments: [], storyLikes: [], saved: [] },
-    searchData: { profileSearches: [], wordSearches: [] },
-    postsViewed: []
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  const loadAllData = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Get the uploaded data path from sessionStorage
-      const dataPath = typeof window !== 'undefined' ? sessionStorage.getItem('instagramDataPath') : null;
-      const queryParam = dataPath ? `&dataPath=${encodeURIComponent(dataPath)}` : '';
-      
-      const [followersResp, followingResp, engagementResp, searchResp, viewsResp] = await Promise.all([
-        fetch(`/api/instagram-data?type=followers${queryParam}`),
-        fetch(`/api/instagram-data?type=following${queryParam}`),
-        fetch(`/api/instagram-data?type=engagement${queryParam}`),
-        fetch(`/api/instagram-data?type=searches${queryParam}`),
-        fetch(`/api/instagram-data?type=posts_viewed${queryParam}`)
-      ]);
-
-      const newData: InstagramData = {
-        followers: followersResp.ok ? await followersResp.json() : [],
-        following: followingResp.ok ? await followingResp.json() : [],
-        engagement: engagementResp.ok ? await engagementResp.json() : { likes: [], comments: [], storyLikes: [], saved: [] },
-        searchData: searchResp.ok ? await searchResp.json() : { profileSearches: [], wordSearches: [] },
-        postsViewed: viewsResp.ok ? await viewsResp.json() : []
-      };
-
-      setData(newData);
-    } catch {
-      setError('Failed to load Instagram data. Please ensure your data export is in the /data folder.');
-    } finally {
-      setLoading(false);
-    }
+  const context = useInstagramDataContext();
+  
+  // Transform context data to match the expected format
+  const data: InstagramData = {
+    followers: context.followers ? context.followers.map(f => ({
+      username: f.value,
+      timestamp: f.timestamp,
+      href: f.href
+    })) : [],
+    following: context.following ? context.following.map(f => ({
+      username: f.value, 
+      timestamp: f.timestamp,
+      href: f.href
+    })) : [],
+    engagement: context.engagementData || { likes: [], comments: [], storyLikes: [], saved: [] },
+    searchData: context.searchData || { profileSearches: [], wordSearches: [] },
+    postsViewed: context.postsViewed || []
   };
+
+  const loading = !context.isLoaded;
+  const error = null; // Handle errors through context if needed
 
   // Calculate derived metrics
   const mutualFollowers = data.followers.filter(f => 
@@ -134,7 +109,6 @@ export function useInstagramData() {
     followingOnly,
     followRatio,
     loading,
-    error,
-    reload: loadAllData
+    error
   };
 }

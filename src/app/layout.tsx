@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { UploadBanner } from "@/components/upload-banner";
 import { Toaster } from "@/components/ui/toast";
+import { InstagramDataProvider } from "@/contexts/instagram-data-context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,11 +39,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavigationProgress />
-          <Navigation />
-          <UploadBanner />
-          {children}
-          <Toaster />
+          <InstagramDataProvider>
+            <NavigationProgress />
+            <Navigation />
+            <UploadBanner />
+            {children}
+            <Toaster />
+          </InstagramDataProvider>
         </ThemeProvider>
       </body>
     </html>
