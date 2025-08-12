@@ -200,14 +200,9 @@ export default function AnalyticsPage() {
               <div className="text-3xl font-bold tracking-tight bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
                 {mutualFollowers.length.toLocaleString()}
               </div>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs font-medium px-2 py-1 bg-pink-500/10 text-pink-600 dark:text-pink-400 rounded-full">
-                  {followRatio} ratio
-                </span>
-                <p className="text-xs font-medium text-muted-foreground">
-                  mutual friends
-                </p>
-              </div>
+              <p className="text-xs font-medium text-muted-foreground mt-2">
+                mutual friends • {followRatio} follow ratio
+              </p>
             </CardContent>
           </GlowingCard>
 
@@ -225,14 +220,9 @@ export default function AnalyticsPage() {
               <div className="text-3xl font-bold tracking-tight bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
                 {engagement.likes.length.toLocaleString()}
               </div>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs font-medium px-2 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-full">
-                  +{engagement.storyLikes.length} stories
-                </span>
-                <p className="text-xs font-medium text-muted-foreground">
-                  total likes
-                </p>
-              </div>
+              <p className="text-xs font-medium text-muted-foreground mt-2">
+                post likes • +{engagement.storyLikes.length} story likes
+              </p>
             </CardContent>
           </GlowingCard>
         </div>
